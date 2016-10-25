@@ -1,5 +1,7 @@
 # Spike Encoders
 
+> Warning: BSA encoder is not vetted.
+
 Spike encoders for Spiking Neural Network.
 
 This package consists of two types of spike encoders for spatio-temporal data:
