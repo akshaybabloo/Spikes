@@ -27,7 +27,7 @@ setup(
     name=name,
     version=get_versions()['version'],
     packages=['Spikes'],
-    url='',
+    url='https://akshaybabloo.github.io/Spikes/',
     license='BSD-3-Clause',
     author='Akshay Raj Gollahalli',
     author_email='akshay@gollahalli.com',
