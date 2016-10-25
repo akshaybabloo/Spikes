@@ -21,8 +21,27 @@ python setup.py install
 
 ## Contribution
 
-Contributions are welcome.
+All contributions are welcome.
 
 ## Issues
 
 Issues can be opened through Github's [Issues](https://github.com/akshaybabloo/Spikes/issues) tab.
+
+## Example
+
+```python
+from __future__ import print_function
+import os
+
+from Spikes import BSA, TBR
+
+data_location = os.path.abspath('Data')
+
+print('BSA Encoder')
+spikes_bsa = BSA(data_location)
+print(spikes_bsa.get_spikes())
+
+print('TBR Encoder')
+spikes_tbr = TBR(data_location)
+print(spikes_tbr.get_spikes())
+```
