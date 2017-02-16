@@ -44,7 +44,7 @@ class BSA:
         """
 
         self.threshold = threshold
-        self.file_reader = ReadCSV(data=data)
+        self.file_reader = data
 
     def get_spikes(self):
         """
@@ -177,7 +177,7 @@ class TBR:
             Threshold level for spike.
         """
 
-        self.data = ReadCSV(data).read_samples()
+        self.data = data
         self.threshold = threshold
 
     def get_spikes(self):
