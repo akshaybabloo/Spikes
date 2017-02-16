@@ -190,3 +190,4 @@ Cube.json
 
 # sphinx build folder
 _build
+.tox
