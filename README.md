@@ -1,5 +1,5 @@
 # Spike Encoders
-
+> Warning and Caution: This project is being converted into a Spiking Neural Network framework.
 > Warning: BSA encoder is not vetted.
 
 Spike encoders for Spiking Neural Network.
