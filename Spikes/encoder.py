@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import firwin
 
-from .Utility import ReadCSV
+from .utility import ReadCSV
 
 __all__ = ['BSA', 'TBR']
 
