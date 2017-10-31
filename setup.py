@@ -2,7 +2,7 @@ import codecs
 import os
 from warnings import warn
 
-from Spikes._version import get_versions
+from spikes._version import get_versions
 
 try:
     from setuptools import setup  # noqa, analysis:ignore
@@ -11,7 +11,7 @@ except ImportError:
     pass
 from distutils.core import setup
 
-name = 'Spikes'
+name = 'spikes'
 here = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -26,7 +26,7 @@ def get_requirements(*parts):
 setup(
     name=name,
     version=get_versions()['version'],
-    packages=['Spikes'],
+    packages=['spikes'],
     url='https://akshaybabloo.github.io/Spikes/',
     license='BSD-3-Clause',
     author='Akshay Raj Gollahalli',
