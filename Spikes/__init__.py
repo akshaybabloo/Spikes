@@ -3,7 +3,7 @@
 #
 # Copyright 2016 Akshay Raj Gollahalli
 
-from .Encoder import BSA
-from .Encoder import TBR
+from .encoder import BSA
+from .encoder import TBR
 
-__all__ = ['Utility', 'Encoder']
+__all__ = ['utility', 'encoder']
