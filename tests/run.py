@@ -3,8 +3,8 @@ import os
 import numpy as np
 import numpy.testing as npt
 
-from Spikes.Utility import ReadCSV
-from Spikes.Encoder import BSA, TBR
+from Spikes.utility import ReadCSV
+from Spikes.encoder import BSA, TBR
 
 data_location = os.path.abspath('Data')
 
