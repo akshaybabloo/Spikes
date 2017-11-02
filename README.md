@@ -1,4 +1,10 @@
 # Spike Encoders
+
+| Branch | Codecov | CI | Requirements |
+|--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| Master | Soon.. | Soon.. | [![Requirements Status](https://requires.io/github/akshaybabloo/Spikes/requirements.svg?branch=master)](https://requires.io/github/akshaybabloo/Spikes/requirements/?branch=master) |
+
+
 > Warning and Caution: This project is being converted into a Spiking Neural Network framework.
 > Warning: BSA encoder is not vetted.
 
