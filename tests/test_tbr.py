@@ -1,12 +1,15 @@
 import numpy as np
 import numpy.testing as npt
+import os
 
 from spikes.encoder import TBR
 from spikes.utility import ReadCSV
 
 
 def test_get_spikes():
-    test_spikes = np.load('test_spikes_TBR.npy')
+    path = os.path.abspath('test_spikes_TBR.npy')
+
+    test_spikes = np.load(path)
     data = ReadCSV('../Data').get_samples()['samples']
 
     spikes = TBR(data).get_spikes()
@@ -15,7 +18,9 @@ def test_get_spikes():
 
 
 def test_get_spikes_time():
-    test_spikes_time = np.load('test_spikes_time_TBR.npy')
+    path = os.path.abspath('test_spikes_time_TBR.npy')
+
+    test_spikes_time = np.load(path)
     data = ReadCSV('../Data').get_samples()['samples']
 
     spikes_time = TBR(data).get_spike_time()
