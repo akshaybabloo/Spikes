@@ -2,11 +2,7 @@
 
 | Branch | Codecov | CI | Requirements |
 |--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| Master | Soon.. | [![Build Status](https://travis-ci.org/akshaybabloo/Spikes.svg?branch=master)](https://travis-ci.org/akshaybabloo/Spikes) | [![Requirements Status](https://requires.io/github/akshaybabloo/Spikes/requirements.svg?branch=master)](https://requires.io/github/akshaybabloo/Spikes/requirements/?branch=master) |
-
-
-> Warning and Caution: This project is being converted into a Spiking Neural Network framework.
-> Warning: BSA encoder is not vetted.
+| Master | Soon.. | [![Build Status](https://travis-ci.org/akshaybabloo/Spikes.svg?branch=master)](https://travis-ci.org/akshaybabloo/Spikes) | [![Updates](https://pyup.io/repos/github/akshaybabloo/Spikes/shield.svg)](https://pyup.io/repos/github/akshaybabloo/Spikes/) |
 
 Spike encoders for Spiking Neural Network.
 
@@ -14,6 +10,16 @@ This package consists of two types of spike encoders for spatio-temporal data:
 
 1. Threshold Based Representation (TBR) encoder
 2. Bens Spiker Algorithm (BSA) encoder
+
+<!-- TOC -->
+
+- [Data](#data)
+- [Instillation](#instillation)
+- [Example](#example)
+- [Contribution](#contribution)
+- [Issues](#issues)
+
+<!-- /TOC -->
 
 ## Data
 
@@ -26,14 +32,6 @@ For example each file given in the [Data](https://github.com/akshaybabloo/Spikes
 ```
 python setup.py install
 ```
-
-## Contribution
-
-All contributions are welcome.
-
-## Issues
-
-Issues can be opened through Github's [Issues](https://github.com/akshaybabloo/Spikes/issues) tab.
 
 ## Example
 
@@ -49,3 +47,11 @@ print(bsa.get_spikes())
 tbr = encoder.TBR(data)
 print(tbr.get_spikes())
 ```
+
+## Contribution
+
+All contributions are welcome.
+
+## Issues
+
+Issues can be opened through Github's [Issues](https://github.com/akshaybabloo/Spikes/issues) tab.
