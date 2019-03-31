@@ -2,7 +2,7 @@
 
 | Branch | Codecov | CI | Requirements |
 |--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| Master | Soon.. | Soon.. | [![Requirements Status](https://requires.io/github/akshaybabloo/Spikes/requirements.svg?branch=master)](https://requires.io/github/akshaybabloo/Spikes/requirements/?branch=master) |
+| Master | Soon.. | [![Build Status](https://travis-ci.org/akshaybabloo/Spikes.svg?branch=master)](https://travis-ci.org/akshaybabloo/Spikes) | [![Requirements Status](https://requires.io/github/akshaybabloo/Spikes/requirements.svg?branch=master)](https://requires.io/github/akshaybabloo/Spikes/requirements/?branch=master) |
 
 
 > Warning and Caution: This project is being converted into a Spiking Neural Network framework.
