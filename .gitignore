@@ -192,3 +192,5 @@ Cube.json
 _build
 .tox
 test/
+
+\.idea/
