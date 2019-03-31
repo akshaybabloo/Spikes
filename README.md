@@ -38,18 +38,14 @@ Issues can be opened through Github's [Issues](https://github.com/akshaybabloo/S
 ## Example
 
 ```python
-from __future__ import print_function
-import os
+from spikes import encoder
+from spikes.utility import ReadCSV
 
-from Spikes import BSA, TBR
+data = ReadCSV('Data').get_samples()['samples']
 
-data_location = os.path.abspath('Data')
+bsa = encoder.BSA(data)
+print(bsa.get_spikes())
 
-print('BSA Encoder')
-spikes_bsa = BSA(data_location)
-print(spikes_bsa.get_spikes())
-
-print('TBR Encoder')
-spikes_tbr = TBR(data_location)
-print(spikes_tbr.get_spikes())
+tbr = encoder.TBR(data)
+print(tbr.get_spikes())
 ```
