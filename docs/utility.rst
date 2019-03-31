@@ -11,7 +11,7 @@ The ``utility.py`` can do the following:
 Reading CSV files
 -----------------
 
-.. autoclass:: Spikes.Utility.ReadCSV
+.. autoclass:: spikes.utility.ReadCSV
     :members:
 
 .. _helpers:
@@ -19,5 +19,5 @@ Reading CSV files
 Helpers
 -------
 
-.. automodule:: Spikes.Utility
+.. automodule:: spikes.utility
     :members: atoi, natural_keys

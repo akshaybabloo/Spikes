@@ -13,7 +13,7 @@ There are two types of encoders:
 Bens Spiker Algorithm
 ---------------------
 
-.. autoclass:: Spikes.Encoder.BSA
+.. autoclass:: spikes.encoder.BSA
     :members:
     :private-members:
 
@@ -22,6 +22,6 @@ Bens Spiker Algorithm
 Threshold Based Representation
 ------------------------------
 
-.. autoclass:: Spikes.Encoder.TBR
+.. autoclass:: spikes.encoder.TBR
     :members:
     :private-members:
