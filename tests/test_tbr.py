@@ -7,9 +7,7 @@ from spikes.utility import ReadCSV
 
 
 def test_get_spikes():
-    path = os.path.abspath('test_spikes_TBR.npy')
-
-    test_spikes = np.load(path)
+    test_spikes = np.load('./test_spikes_TBR.npy')
     data = ReadCSV('../Data').get_samples()['samples']
 
     spikes = TBR(data).get_spikes()
@@ -18,9 +16,7 @@ def test_get_spikes():
 
 
 def test_get_spikes_time():
-    path = os.path.abspath('test_spikes_time_TBR.npy')
-
-    test_spikes_time = np.load(path)
+    test_spikes_time = np.load('./test_spikes_time_TBR.npy')
     data = ReadCSV('../Data').get_samples()['samples']
 
     spikes_time = TBR(data).get_spike_time()

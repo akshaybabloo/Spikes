@@ -7,9 +7,7 @@ from spikes.utility import ReadCSV
 
 
 def test_get_spikes():
-    path = os.path.abspath('test_spikes_BSA.npy')
-
-    test_spikes = np.load(path)
+    test_spikes = np.load('./test_spikes_BSA.npy')
     data = ReadCSV('../Data').get_samples()['samples']
 
     spikes = BSA(data).get_spikes()
@@ -18,9 +16,7 @@ def test_get_spikes():
 
 
 def test_get_spikes_time():
-    path = os.path.abspath('test_spikes_time_BSA.npy')
-
-    test_spikes_time = np.load(path)
+    test_spikes_time = np.load('./test_spikes_time_BSA.npy')
     data = ReadCSV('../Data').get_samples()['samples']
 
     spikes_time = BSA(data).get_spike_time()
