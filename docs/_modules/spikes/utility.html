@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>spikes.utility &#8212; Encoder alpha documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Encoder alpha documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spikes.utility</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2016 Akshay Raj Gollahalli</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Reads the data from folders and json files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+
+<span class="kn">from</span> <span class="nn">.utils.errors</span> <span class="k">import</span> <span class="n">LengthMismatchError</span><span class="p">,</span> <span class="n">NotEnoughDataError</span><span class="p">,</span> <span class="n">SplitDataError</span>
+<span class="kn">from</span> <span class="nn">.utils.utils</span> <span class="k">import</span> <span class="n">log_it</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ReadCSV&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="ReadCSV"><a class="viewcode-back" href="../../utility.html#spikes.utility.ReadCSV">[docs]</a><span class="k">class</span> <span class="nc">ReadCSV</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads the CSV files in a given folder.</span>
+
+<span class="sd">    If no folder names is give, this program searches for folder ``Data``; If</span>
+<span class="sd">    no location is given.</span>
+
+<span class="sd">    :param str path: Needed.</span>
+<span class="sd">        Location of the directory containing the data files.</span>
+<span class="sd">    :param bool log: Default False.</span>
+<span class="sd">        Verbose mode.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">yes_no</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+
+        <span class="n">log_it</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yes_no</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ReadCSV class called&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span> <span class="o">=</span> <span class="p">[</span><span class="n">filename</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span><span class="p">)</span> <span class="k">if</span>
+                                 <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;sam&quot;</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading the data&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> does not exist&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Data files not found - </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NotEnoughDataError</span><span class="p">(</span><span class="s2">&quot;There should be more than one sample to continue.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReadCSV.get_samples"><a class="viewcode-back" href="../../utility.html#spikes.utility.ReadCSV.get_samples">[docs]</a>    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads all the sample starting with sam*.csv and returns a Pandas DataFrame.</span>
+
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        :return samples:</span>
+<span class="sd">            A dictionary of ``samples`` and ``labels`` (this depends if you have labels file).</span>
+
+<span class="sd">        &gt;&gt;&gt; data = ReadCSV(&#39;Data&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; data.get_samples()</span>
+<span class="sd">            {</span>
+<span class="sd">            &#39;labels&#39;: [...],</span>
+<span class="sd">            &#39;samples: array(...)</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">natural_keys</span><span class="p">)</span>  <span class="c1"># Sorted with filename and sample number</span>
+
+        <span class="n">abs_path_of_samples</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span> <span class="k">for</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span><span class="p">]</span>
+        <span class="n">raw_samples_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">abs_path_of_samples</span><span class="p">])</span>
+
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_class_labels</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_samples_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+                <span class="n">LengthMismatchError</span><span class="p">(</span>
+                    <span class="s2">&quot;Number of samples (</span><span class="si">{0}</span><span class="s2">) is not equal to number of labels (</span><span class="si">{1}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">raw_samples_list</span><span class="p">),</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)))</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;samples&#39;</span><span class="p">:</span> <span class="n">raw_samples_list</span><span class="p">,</span> <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">labels</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;samples&#39;</span><span class="p">:</span> <span class="n">raw_samples_list</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+<div class="viewcode-block" id="ReadCSV.get_split_data"><a class="viewcode-back" href="../../utility.html#spikes.utility.ReadCSV.get_split_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_split_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_to</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split samples into training and testing data.</span>
+
+<span class="sd">        The default test size is 0.5 (50%)</span>
+
+<span class="sd">        :param float split_to:</span>
+<span class="sd">            Percentage split training and testing. Defaults to ``0.5``.</span>
+
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        :return:</span>
+<span class="sd">            Dictionary of ``train_samples``, ``train_labels``, ``test_samples``,</span>
+<span class="sd">            ``test_labels`` and ``split_percentage``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">split_to</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SplitDataError</span><span class="p">(</span><span class="s2">&quot;Split data should be less that 1.0&quot;</span><span class="p">)</span>
+
+        <span class="n">train_samples</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">test_samples</span><span class="p">,</span> <span class="n">test_labels</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+            <span class="n">samples</span><span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">],</span>
+            <span class="n">samples</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">],</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">split_to</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Data has been split into Training and Testing data&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;train_samples&#39;</span><span class="p">:</span> <span class="n">train_samples</span><span class="p">,</span> <span class="s1">&#39;train_labels&#39;</span><span class="p">:</span> <span class="n">train_labels</span><span class="p">,</span>
+                <span class="s1">&#39;test_samples&#39;</span><span class="p">:</span> <span class="n">test_samples</span><span class="p">,</span>
+                <span class="s1">&#39;test_labels&#39;</span><span class="p">:</span> <span class="n">test_labels</span><span class="p">,</span>
+                <span class="s1">&#39;split_percentage&#39;</span><span class="p">:</span> <span class="n">split_to</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="ReadCSV.sample_size"><a class="viewcode-back" href="../../utility.html#spikes.utility.ReadCSV.sample_size">[docs]</a>    <span class="k">def</span> <span class="nf">sample_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the length of the sample size.</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :return size:</span>
+<span class="sd">            Length on samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sample size returned&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="ReadCSV.time_feature_length"><a class="viewcode-back" href="../../utility.html#spikes.utility.ReadCSV.time_feature_length">[docs]</a>    <span class="k">def</span> <span class="nf">time_feature_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the time length of a file by counting it&#39;s number of columns.</span>
+
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        :return data_dict:</span>
+<span class="sd">            Dictionary of ``time_length`` and ``feature_length``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="n">_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+                <span class="n">sample</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+        <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time_length&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span> <span class="s1">&#39;feature_length&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Feature length returned&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_dict</span></div>
+
+<div class="viewcode-block" id="ReadCSV.get_feature_names"><a class="viewcode-back" href="../../utility.html#spikes.utility.ReadCSV.get_feature_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads feature names from ``feature_names_eeg.txt`` if it is present else creates a</span>
+<span class="sd">        feature names automatically.</span>
+
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        :return data_dict:</span>
+<span class="sd">            A dictionary of Python list, which contains ``number_of_features`` and</span>
+<span class="sd">            ``name_features``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">number_of_features</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="s1">&#39;feature_names_eeg.txt&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="s1">&#39;feature_names_eeg.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">_file</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">number_of_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;File not found - </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixed</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">_file</span><span class="p">:</span>
+                <span class="n">number_of_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">number_of_features</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;feature </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;number_of_features&#39;</span><span class="p">:</span> <span class="n">number_of_features</span><span class="p">,</span> <span class="s1">&#39;name_features&#39;</span><span class="p">:</span> <span class="n">names</span><span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_class_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="s1">&#39;tar_class_labels.csv&#39;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="s1">&#39;tar_class_labels.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
+                <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+                    <span class="n">_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Class labels returned&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_labels</span></div>
+
+
+<div class="viewcode-block" id="atoi"><a class="viewcode-back" href="../../utility.html#spikes.utility.atoi">[docs]</a><span class="k">def</span> <span class="nf">atoi</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if the file names contain numbers.</span>
+
+<span class="sd">    :param str text:</span>
+<span class="sd">        File name.</span>
+
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    :return: True or false based on the digits in text.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;File names checked&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">else</span> <span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="natural_keys"><a class="viewcode-back" href="../../utility.html#spikes.utility.natural_keys">[docs]</a><span class="k">def</span> <span class="nf">natural_keys</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits the number from the file name.</span>
+
+<span class="sd">    :param str text:</span>
+<span class="sd">        File name.</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    :return:</span>
+<span class="sd">        Splits the ``text`` if number is present in it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;File names split&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">atoi</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d+)&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Encoder alpha documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Akshay Raj Gollahalli.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.
+    </div>
+  </body>
+</html>

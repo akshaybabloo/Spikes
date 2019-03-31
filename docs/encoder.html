@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Encoders &#8212; Encoder alpha documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utility" href="utility.html" />
+    <link rel="prev" title="Spiking Neural Network Encoders" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utility.html" title="Utility"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Spiking Neural Network Encoders"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Encoder alpha documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="encoders">
+<h1>Encoders<a class="headerlink" href="#encoders" title="Permalink to this headline">¶</a></h1>
+<p>Spike encoders for Spiking Neural Network (spatio-temporal data)</p>
+<p>There are two types of encoders:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#bsa"><span class="std std-ref">Bens Spiker Algorithm (BSA)</span></a></p></li>
+<li><p><a class="reference internal" href="#tbr"><span class="std std-ref">Threshold Based Representation (TBR)</span></a></p></li>
+</ul>
+<div class="section" id="bens-spiker-algorithm">
+<span id="bsa"></span><h2>Bens Spiker Algorithm<a class="headerlink" href="#bens-spiker-algorithm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spikes.encoder.BSA">
+<em class="property">class </em><code class="descclassname">spikes.encoder.</code><code class="descname">BSA</code><span class="sig-paren">(</span><em>data</em>, <em>threshold=0.5</em>, <em>filter_length=2</em>, <em>cutoff=0.8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#BSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.BSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bens Spiker Algorithm (BSA) uses Finite Impulse Response (FIR) filter to try a reverse convolution of the
+stimulation (converting spikes to analog values). A principle borrowed from unpublished modified
+Hough Spiker Algorithm (HSA) <a class="footnote-reference brackets" href="#id2" id="id1">2</a>.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">2</a></span></dt>
+<dd><p>Schrauwen, B., &amp; Van Campenhout, J. (2003, July). BSA, a fast and accurate spike train encoding scheme.
+In Proceedings of the international joint conference on neural networks (Vol. 4, No. 4, pp. 2825-2830).
+Piscataway, NJ: IEEE.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>) – See :py:mod: nucube.utils.ReadCSV.get_samples()</p></li>
+<li><p><strong>threshold</strong> (<em>float</em>) – Threshold level for spike. It can also be a list of threshold according to the numbers of input features.</p></li>
+<li><p><strong>filter_length</strong> (<em>int</em>) – </p></li>
+<li><p><strong>cutoff</strong> (<em>float</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="spikes.encoder.BSA._fir_filter">
+<code class="descname">_fir_filter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#BSA._fir_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.BSA._fir_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns FIR filter using window method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Return flow</dt>
+<dd class="field-even"><p>The dictionary contains the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_values</span></code>: A list of float.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_length</span></code>: The length of <code class="docutils literal notranslate"><span class="pre">filter_value</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spikes.encoder.BSA.get_spike_time">
+<code class="descname">get_spike_time</code><span class="sig-paren">(</span><em>offset=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#BSA.get_spike_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.BSA.get_spike_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges the samples and returns the time at which the spike happens. Spike time always startes with <code class="docutils literal notranslate"><span class="pre">1</span></code> and
+increases with :param: offset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset</strong> (<em>int</em>) – Shifting the spike index to the given number, if the first index is <code class="docutils literal notranslate"><span class="pre">0</span></code>, then it will always be <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Spike time with an offset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spikes.encoder.BSA.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#BSA.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.BSA.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns BSA spikes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+<dt class="field-even">Return output</dt>
+<dd class="field-even"><p>Returns an multidimensional ndarray where each ndarray of ndarray is a sample.</p>
+</dd>
+</dl>
+<p>See ReadData on how to setup the files.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spike_object</span> <span class="o">=</span> <span class="n">BSA</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spike_object</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
+<span class="go">[[[1 1 1 ... 0 0 0]</span>
+<span class="go">  [1 1 1 ... 1 1 1]</span>
+<span class="go">  [1 1 1 ... 0 1 1]</span>
+<span class="go">  ...</span>
+<span class="go">  [1 1 1 ... 1 1 1]</span>
+<span class="go">  [0 0 0 ... 0 0 0]</span>
+<span class="go">  [0 0 0 ... 0 0 0]]</span>
+<span class="go"> [[0 1 1 ... 1 1 1]</span>
+<span class="go">  [1 1 1 ... 1 1 1]</span>
+<span class="go">  [0 1 0 ... 1 0 1]</span>
+<span class="go">  ...</span>
+<span class="go">  [0 0 0 ... 0 0 0]</span>
+<span class="go">  [0 0 0 ... 0 0 0]</span>
+<span class="go">  [0 0 0 ... 0 0 0]]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="threshold-based-representation">
+<span id="tbr"></span><h2>Threshold Based Representation<a class="headerlink" href="#threshold-based-representation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spikes.encoder.TBR">
+<em class="property">class </em><code class="descclassname">spikes.encoder.</code><code class="descname">TBR</code><span class="sig-paren">(</span><em>data</em>, <em>threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#TBR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.TBR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Threshold Based Representation encoding <a class="footnote-reference brackets" href="#id4" id="id3">1</a></p>
+<dl class="footnote brackets">
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
+<dd><p>Delbruck, T., &amp; Lichtsteiner, P. (2007, May). Fast sensory motor control based on event-based hybrid
+neuromorphic-procedural system. In 2007 IEEE International Symposium on Circuits and Systems (pp. 845-848). IEEE.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – See :py:mod: nucube.utils.ReadCSV</p></li>
+<li><p><strong>threshold</strong> (<em>float</em>) – Threshold to cut off spike detection.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="spikes.encoder.TBR._get_mean_sd_sample">
+<code class="descname">_get_mean_sd_sample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#TBR._get_mean_sd_sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.TBR._get_mean_sd_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mean and standard deviation of absolute data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(numpy.ndarray, numpy.ndarray)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mean, sd</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spikes.encoder.TBR._get_threshold">
+<code class="descname">_get_threshold</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#TBR._get_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.TBR._get_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns threshold values for each feature of every sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>threshold</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spikes.encoder.TBR._get_training_element_difference">
+<code class="descname">_get_training_element_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#TBR._get_training_element_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.TBR._get_training_element_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns row-by-row difference for each sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>row_diff</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spikes.encoder.TBR.get_spike_time">
+<code class="descname">get_spike_time</code><span class="sig-paren">(</span><em>offset=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#TBR.get_spike_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.TBR.get_spike_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges the samples and returns the time at which the spike happens. Spike time always startes with <code class="docutils literal notranslate"><span class="pre">1</span></code> and
+increases with :param: offset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset</strong> (<em>int</em>) – Shifting the spike index to the given number, if the first index is <code class="docutils literal notranslate"><span class="pre">0</span></code>, then it will always be <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Spike time with an offset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="spikes.encoder.TBR.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikes/encoder.html#TBR.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spikes.encoder.TBR.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns TBR spikes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>spikes</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spikes</span> <span class="o">=</span> <span class="n">TBR</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spikes</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
+<span class="go">    [[[0 0 0 ..., 0 0 0]</span>
+<span class="go">    [1 1 1 ..., 1 1 1]</span>
+<span class="go">    [0 0 1 ..., 1 0 1]</span>
+<span class="go">    ...,</span>
+<span class="go">    [0 0 0 ..., 1 0 0]</span>
+<span class="go">    [0 0 0 ..., 0 0 1]</span>
+<span class="go">    [0 0 0 ..., 0 0 0]]</span>
+<span class="go">    |</span>
+<span class="go">    [[0 0 0 ..., 0 0 0]</span>
+<span class="go">    [0 0 0 ..., 0 0 0]</span>
+<span class="go">    [0 1 0 ..., 0 1 1]</span>
+<span class="go">    ...,</span>
+<span class="go">    [0 0 0 ..., 0 0 0]</span>
+<span class="go">    [0 0 0 ..., 0 0 1]</span>
+<span class="go">    [1 0 1 ..., 0 0 1]]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Encoders</a><ul>
+<li><a class="reference internal" href="#bens-spiker-algorithm">Bens Spiker Algorithm</a></li>
+<li><a class="reference internal" href="#threshold-based-representation">Threshold Based Representation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Spiking Neural Network Encoders</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utility.html"
+                        title="next chapter">Utility</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/encoder.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utility.html" title="Utility"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Spiking Neural Network Encoders"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Encoder alpha documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Akshay Raj Gollahalli.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.
+    </div>
+  </body>
+</html>
