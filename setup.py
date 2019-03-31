@@ -26,7 +26,7 @@ def get_requirements(*parts):
 setup(
     name=name,
     version=get_versions()['version'],
-    packages=['spikes'],
+    packages=['spikes', 'spikes.utils'],
     url='https://akshaybabloo.github.io/Spikes/',
     license='BSD-3-Clause',
     author='Akshay Raj Gollahalli',
