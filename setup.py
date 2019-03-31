@@ -2,7 +2,7 @@ import codecs
 import os
 from warnings import warn
 
-from spikes._version import get_versions
+from spikes.__version__ import get_versions
 
 try:
     from setuptools import setup  # noqa, analysis:ignore
