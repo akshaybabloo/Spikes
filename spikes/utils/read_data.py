@@ -39,19 +39,19 @@ class ReadCSV(object):
         self.data_folder = os.path.abspath(path) + os.sep
 
         log_it(self.yes_no)
-        self.log = logging.getLogger(self.__class__.__name__)
-        self.log.setLevel(logging.debug)
-        self.log.debug("ReadCSV class called")
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.setLevel(logging.debug)
+        self.logger.debug("ReadCSV class called")
 
         try:
             if os.path.isdir(self.data_folder):
                 self.prefixed = [filename for filename in os.listdir(self.data_folder) if
                                  filename.startswith("sam")]
-                self.log.debug("Reading the data")
+                self.logger.debug("Reading the data")
             else:
-                self.log.debug("%s does not exist", self.data_folder)
+                self.logger.debug("%s does not exist", self.data_folder)
         except IOError as err:
-            self.log.exception("Data files not found - %s", err)
+            self.logger.exception("Data files not found - %s", err)
             sys.exit(1)
 
         if len(self.prefixed) is 1:
@@ -116,7 +116,7 @@ class ReadCSV(object):
             samples['labels'],
             test_size=split_to)
 
-        self.log.debug("Data has been split into Training and Testing data")
+        self.logger.debug("Data has been split into Training and Testing data")
 
         return {'train_samples': train_samples, 'train_labels': train_labels,
                 'test_samples': test_samples,
@@ -131,7 +131,7 @@ class ReadCSV(object):
             Length on samples.
         """
         size = len(self.prefixed)
-        self.log.debug("Sample size returned")
+        self.logger.debug("Sample size returned")
         return size
 
     def time_feature_length(self):
@@ -150,7 +150,7 @@ class ReadCSV(object):
                 sample.append(col)
 
         data_dict = {'time_length': len(sample), 'feature_length': len(sample[0][0].split(','))}
-        self.log.debug("Feature length returned")
+        self.logger.debug("Feature length returned")
         return data_dict
 
     def _get_class_labels(self):
@@ -163,7 +163,7 @@ class ReadCSV(object):
         else:
             _labels.append(False)
 
-        self.log.debug("Class labels returned")
+        self.logger.debug("Class labels returned")
         return _labels
 
 
