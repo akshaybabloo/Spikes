@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright 2016 Akshay Raj Gollahalli
-
 """
 Reads the data from folders and json files.
 """
-
-from __future__ import print_function
 
 import csv
 import logging
@@ -18,8 +15,8 @@ import sys
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from .utils.errors import LengthMismatchError, NotEnoughDataError, SplitDataError
-from .utils.utils import log_it
+from .errors import LengthMismatchError, NotEnoughDataError, SplitDataError
+from .utils import log_it
 
 __all__ = ['ReadCSV']
 
@@ -30,7 +27,7 @@ class ReadCSV(object):
     If no folder names is give, this program searches for folder ``Data``; If
     no location is given.
 
-    :param str path: Needed.
+    :param str path:
         Location of the directory containing the data files.
     :param bool log: Default False.
         Verbose mode.
@@ -155,35 +152,6 @@ class ReadCSV(object):
         data_dict = {'time_length': len(sample), 'feature_length': len(sample[0][0].split(','))}
         self.log.debug("Feature length returned")
         return data_dict
-
-    def get_feature_names(self):
-        """
-        Reads feature names from ``feature_names_eeg.txt`` if it is present else creates a
-        feature names automatically.
-
-        :rtype: dict
-        :return data_dict:
-            A dictionary of Python list, which contains ``number_of_features`` and
-            ``name_features``.
-        """
-
-        names = []
-        number_of_features = 0
-        if os.path.isfile(self.data_folder + 'feature_names_eeg.txt'):
-            try:
-                with open(self.data_folder + 'feature_names_eeg.txt', 'r') as _file:
-                    data = _file.read()
-                names = data.split('\n')
-                number_of_features = len(names)
-            except IOError as err:
-                self.log.exception("File not found - %s", err)
-        else:
-            with open(self.data_folder + self.prefixed[0]) as _file:
-                number_of_features = len(_file.readline().split(','))
-                for num in range(1, number_of_features + 1):
-                    names.append("feature {}".format(num))
-
-        return {'number_of_features': number_of_features, 'name_features': names}
 
     def _get_class_labels(self):
         _labels = []
