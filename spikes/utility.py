@@ -42,9 +42,9 @@ class ReadCSV(object):
         self.data_folder = os.path.abspath(path) + os.sep
 
         log_it(self.yes_no)
-        self.log = logging.getLogger(self.__class__.__name__)
-        self.log.setLevel(logging.debug)
-        self.log.debug("ReadCSV class called")
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.debug("ReadCSV class called")
 
         try:
             if os.path.isdir(self.data_folder):
