@@ -40,7 +40,6 @@ class ReadCSV(object):
 
         log_it(self.yes_no)
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.setLevel(logging.debug)
         self.logger.debug("ReadCSV class called")
 
         try:
