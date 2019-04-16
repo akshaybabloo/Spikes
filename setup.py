@@ -27,7 +27,7 @@ setup(
     name=name,
     version=get_versions()['version'],
     packages=['spikes', 'spikes.utils'],
-    url='https://akshaybabloo.github.io/Spikes/',
+    url='https://github.com/akshaybabloo/Spikes',
     license='BSD-3-Clause',
     author='Akshay Raj Gollahalli',
     author_email='akshay@gollahalli.com',
@@ -36,7 +36,7 @@ setup(
     install_requires=get_requirements('requirements.txt'),
     keywords="Spiking Neural Network spike encoder",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
         "Operating System :: OS Independent",
