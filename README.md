@@ -30,7 +30,7 @@ For example each file given in the [Data](https://github.com/akshaybabloo/Spikes
 ## Instillation
 
 ```
-python setup.py install
+pip install pyspikes
 ```
 
 ## Example
