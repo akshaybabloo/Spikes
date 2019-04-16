@@ -11,7 +11,7 @@ except ImportError:
     pass
 from distutils.core import setup
 
-name = 'spikes'
+name = 'pyspikes'
 here = os.path.abspath(os.path.dirname(__file__))
 
 
