@@ -1,8 +1,8 @@
 # Spike Encoders
 
-| Branch | Codecov | CI | Requirements |
-|--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| Master | Soon.. | [![Build Status](https://travis-ci.org/akshaybabloo/Spikes.svg?branch=master)](https://travis-ci.org/akshaybabloo/Spikes) | [![Updates](https://pyup.io/repos/github/akshaybabloo/Spikes/shield.svg)](https://pyup.io/repos/github/akshaybabloo/Spikes/) |
+| Branch | Codecov | CI |
+|--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|
+| Master | Soon.. | [![Build Status](https://travis-ci.org/akshaybabloo/Spikes.svg?branch=master)](https://travis-ci.org/akshaybabloo/Spikes) |
 
 Spike encoders for Spiking Neural Network.
 
