@@ -26,6 +26,7 @@ setup(
     author_email='akshay@gollahalli.com',
     description='Spiking Neural Network Spike Encoders',
     long_description=get_long_description('README.md'),
+    long_description_content_type="text/markdown",
     install_requires=get_requirements('requirements.txt'),
     keywords="Spiking Neural Network spike encoder",
     classifiers=[
