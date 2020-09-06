@@ -77,7 +77,8 @@ class TBR(Encoder):
         spikes = []
         for idx, sample in enumerate(row_diff):
             spikes.append(np.where(np.greater(sample, sample_feature_threshold[idx]), 1,
-                                   np.where(np.less(sample, -sample_feature_threshold[idx]), -1, 0)))
+                                   np.where(np.less(sample, -sample_feature_threshold[idx]), -1,
+                                            0)))
 
         # np.array([np.sign(sample_feature_threshold[i] - a) for i, a in enumerate(row_diff)])  # Possible answer
 
@@ -219,7 +220,8 @@ class BSA(Encoder):
         fir_filter = self._fir_filter()
 
         if isinstance(self.threshold, float) or isinstance(self.threshold, int):
-            bsa_row_vector = np.ones(features_size) * self.threshold  # Transforming to scalar vector
+            bsa_row_vector = np.ones(
+                features_size) * self.threshold  # Transforming to scalar vector
         elif isinstance(self.threshold, list):
             bsa_row_vector = self.threshold
         else:
@@ -228,11 +230,14 @@ class BSA(Encoder):
         min_data = np.array([np.min(_sample, axis=0) for _sample in self.data])
         max_data = np.array([np.max(_sample, axis=0) for _sample in self.data])
 
-        min_data_tile = np.array([np.tile(min_data[num], (sample_rate, 1)) for num in range(sample_size)])
-        max_data_tile = np.array([np.tile(max_data[num], (sample_rate, 1)) for num in range(sample_size)])
+        min_data_tile = np.array(
+            [np.tile(min_data[num], (sample_rate, 1)) for num in range(sample_size)])
+        max_data_tile = np.array(
+            [np.tile(max_data[num], (sample_rate, 1)) for num in range(sample_size)])
 
         encoding_data = np.subtract(self.data, min_data_tile)
-        encoding_data = np.divide(encoding_data, list(map(operator.sub, max_data_tile, min_data_tile)))
+        encoding_data = np.divide(encoding_data,
+                                  list(map(operator.sub, max_data_tile, min_data_tile)))
 
         output = np.zeros([sample_size, sample_rate, features_size], dtype=np.int8)
 
@@ -244,7 +249,8 @@ class BSA(Encoder):
                     error2 = 0
 
                     for j in range(0, fir_filter['filter_length']):
-                        error1 += abs(encoding_data[_sample][_idx][_feature] - fir_filter['filter_values'][j])
+                        error1 += abs(
+                            encoding_data[_sample][_idx][_feature] - fir_filter['filter_values'][j])
                         error2 += abs(encoding_data[_sample][_idx][_feature])
 
                     if error1 <= (error2 - bsa_row_vector[_feature]):
@@ -252,7 +258,8 @@ class BSA(Encoder):
 
                         for j in range(0, fir_filter['filter_length']):
                             if _idx + j <= features_size:
-                                encoding_data[_sample][_idx][_feature] -= fir_filter['filter_values'][j]
+                                encoding_data[_sample][_idx][_feature] -= \
+                                    fir_filter['filter_values'][j]
 
         return output
 

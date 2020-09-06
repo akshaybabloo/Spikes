@@ -7,6 +7,7 @@ class Encoder:
     """
     Base for encoders.
     """
+
     def __init__(self):
         pass
 

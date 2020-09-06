@@ -57,7 +57,7 @@ class ReadCSV(object):
             self.logger.exception("Data files not found - %s", err)
             sys.exit(1)
 
-        if len(self.prefixed) is 1:
+        if len(self.prefixed) == 1:
             raise NotEnoughDataError("There should be more than one sample to continue.")
 
     def get_samples(self):

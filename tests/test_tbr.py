@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.testing as npt
-import os
 
 from spikes.encoder import TBR
 from spikes.utility import ReadCSV

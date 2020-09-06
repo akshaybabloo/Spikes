@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.testing as npt
-import os
 
 from spikes.encoder import BSA
 from spikes.utility import ReadCSV
