@@ -1,15 +1,8 @@
 import codecs
 import os
-from warnings import warn
+from distutils.core import setup
 
 from spikes.__version__ import get_versions
-
-try:
-    from setuptools import setup  # noqa, analysis:ignore
-except ImportError:
-    warn("unable to load setuptools. 'setup.py develop' will not work")
-    pass
-from distutils.core import setup
 
 name = 'pyspikes'
 here = os.path.abspath(os.path.dirname(__file__))
