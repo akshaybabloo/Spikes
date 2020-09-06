@@ -2,7 +2,7 @@
 
 | Branch | Codecov | CI |
 |--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|
-| Master | Soon.. | [![Build Status](https://travis-ci.org/akshaybabloo/Spikes.svg?branch=master)](https://travis-ci.org/akshaybabloo/Spikes) |
+| Master | Soon.. | ![Python application](https://github.com/akshaybabloo/Spikes/workflows/Python%20application/badge.svg) |
 
 Spike encoders for Spiking Neural Network.
 
