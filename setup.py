@@ -1,6 +1,6 @@
 import codecs
 import os
-from distutils.core import setup
+from setuptools import setup
 
 from spikes.__version__ import get_versions
 
