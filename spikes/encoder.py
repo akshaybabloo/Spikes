@@ -303,3 +303,46 @@ class BSA(Encoder):
         flow = {'filter_values': filter_values, 'filter_length': len(filter_values)}
 
         return flow
+
+class StepForward:
+    """
+    Step Forward Algorithm (SF) encoder.
+
+    Iteratively accumulates absolute values across time steps and emits a spike
+    whenever the accumulated value crosses the threshold, resetting the accumulator
+    by subtracting the threshold. This provides a rate-based encoding scheme.
+    """
+    def __init__(self, data, threshold=0.5):
+        self.data = np.array(data)
+        self.threshold = threshold
+        self._spikes = None
+
+    def get_spikes(self):
+        if self._spikes is not None:
+            return self._spikes
+
+        samples = []
+        for sample in self.data:
+            sample_spikes = np.zeros_like(sample, dtype=int)
+            for i in range(sample.shape[0]):
+                acc = 0.0
+                for j in range(sample.shape[1]):
+                    acc += np.abs(sample[i, j])
+                    if acc >= self.threshold:
+                        sample_spikes[i, j] = 1
+                        acc -= self.threshold
+            samples.append(sample_spikes)
+        self._spikes = np.array(samples)
+        return self._spikes
+
+    def get_spike_time(self, offset=100):
+        if self._spikes is None:
+            self.get_spikes()
+        spike_times = []
+        for sample in self._spikes:
+            times = []
+            for feature in range(sample.shape[0]):
+                t = np.where(sample[feature] == 1)[0]
+                times.append(t + offset)
+            spike_times.append(times)
+        return spike_times
