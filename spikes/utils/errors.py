@@ -1,12 +1,11 @@
-
 """
 Exception used through out the Spikes api.
 """
 
 __all__ = [
-    'LengthMismatchError',
-    'NotEnoughDataError',
-    'SplitDataError',
+    "LengthMismatchError",
+    "NotEnoughDataError",
+    "SplitDataError",
 ]
 
 

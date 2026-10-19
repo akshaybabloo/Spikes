@@ -1,4 +1,3 @@
-
 """
 Reads the data from folders and json files.
 """
@@ -15,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from .errors import LengthMismatchError, NotEnoughDataError, SplitDataError
 from .utils import log_it
 
-__all__ = ['ReadCSV']
+__all__ = ["ReadCSV"]
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +43,7 @@ class ReadCSV:
 
         try:
             if os.path.isdir(self.data_folder):
-                self.prefixed = [filename for filename in os.listdir(self.data_folder) if
-                                 filename.startswith("sam")]
+                self.prefixed = [filename for filename in os.listdir(self.data_folder) if filename.startswith("sam")]
                 self.logger.debug("Reading the data")
             else:
                 self.logger.debug("%s does not exist", self.data_folder)
@@ -74,18 +72,18 @@ class ReadCSV:
         self.prefixed.sort(key=natural_keys)  # Sorted with filename and sample number
 
         abs_path_of_samples = [self.data_folder + self.prefixed for self.prefixed in self.prefixed]
-        raw_samples_list = np.asarray(
-            [np.genfromtxt(sample, delimiter=',') for sample in abs_path_of_samples])
+        raw_samples_list = np.asarray([np.genfromtxt(sample, delimiter=",") for sample in abs_path_of_samples])
 
         labels = self._get_class_labels()
 
         if labels[0] is not False:
             if len(raw_samples_list) != len(labels):
                 LengthMismatchError(
-                    f"Number of samples ({len(raw_samples_list)}) is not equal to number of labels ({len(labels)}).")
-            samples = {'samples': raw_samples_list, 'labels': labels}
+                    f"Number of samples ({len(raw_samples_list)}) is not equal to number of labels ({len(labels)})."
+                )
+            samples = {"samples": raw_samples_list, "labels": labels}
         else:
-            samples = {'samples': raw_samples_list}
+            samples = {"samples": raw_samples_list}
 
         return samples
 
@@ -109,16 +107,18 @@ class ReadCSV:
             raise SplitDataError("Split data should be less that 1.0")
 
         train_samples, train_labels, test_samples, test_labels = train_test_split(
-            samples['samples'],
-            samples['labels'],
-            test_size=split_to)
+            samples["samples"], samples["labels"], test_size=split_to
+        )
 
         self.logger.debug("Data has been split into Training and Testing data")
 
-        return {'train_samples': train_samples, 'train_labels': train_labels,
-                'test_samples': test_samples,
-                'test_labels': test_labels,
-                'split_percentage': split_to}
+        return {
+            "train_samples": train_samples,
+            "train_labels": train_labels,
+            "test_samples": test_samples,
+            "test_labels": test_labels,
+            "split_percentage": split_to,
+        }
 
     def sample_size(self):
         """Returns the length of the sample size.
@@ -141,17 +141,17 @@ class ReadCSV:
         """
         _file = self.prefixed[0]
         with open(self.data_folder + _file) as csv_file:
-            sample = list(csv.reader(csv_file, delimiter=' ', quotechar='|'))
+            sample = list(csv.reader(csv_file, delimiter=" ", quotechar="|"))
 
-        data_dict = {'time_length': len(sample), 'feature_length': len(sample[0][0].split(','))}
+        data_dict = {"time_length": len(sample), "feature_length": len(sample[0][0].split(","))}
         self.logger.debug("Feature length returned")
         return data_dict
 
     def _get_class_labels(self):
         _labels = []
-        if os.path.isfile(self.data_folder + 'tar_class_labels.csv'):
-            with open(self.data_folder + 'tar_class_labels.csv', 'r') as csv_file:
-                reader = csv.reader(csv_file, delimiter=' ', quotechar='|')
+        if os.path.isfile(self.data_folder + "tar_class_labels.csv"):
+            with open(self.data_folder + "tar_class_labels.csv", "r") as csv_file:
+                reader = csv.reader(csv_file, delimiter=" ", quotechar="|")
                 for row in reader:
                     _labels.append(int(row[0]))
         else:
@@ -185,4 +185,4 @@ def natural_keys(text):
         Splits the ``text`` if number is present in it.
     """
     logger.debug("File names split")
-    return [atoi(num) for num in re.split(r'(\d+)', text)]
+    return [atoi(num) for num in re.split(r"(\d+)", text)]

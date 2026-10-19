@@ -1,3 +1,1 @@
-
-
-__all__ = ['encoder', 'utility']
+__all__ = ["encoder", "utility"]

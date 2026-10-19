@@ -39,7 +39,7 @@ pip install pyspikes
 from spikes import encoder
 from spikes.utility import ReadCSV
 
-data = ReadCSV('Data').get_samples()['samples']
+data = ReadCSV("Data").get_samples()["samples"]
 
 bsa = encoder.BSA(data)
 print(bsa.get_spikes())
