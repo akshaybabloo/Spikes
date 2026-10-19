@@ -40,6 +40,7 @@ dev = [
     "coverage>=7.16.2",
     "numba>=0.68",
     "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
     "ruff>=0.17.1",
     "sphinx>=9.1.0",
 ]
