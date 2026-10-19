@@ -6,10 +6,11 @@
 
 Spike encoders for Spiking Neural Network.
 
-This package consists of two types of spike encoders for spatio-temporal data:
+This package consists of three types of spike encoders for spatio-temporal data:
 
 1. Threshold Based Representation (TBR) encoder
 2. Bens Spiker Algorithm (BSA) encoder
+3. Step Forward (SF) encoder
 
 <!-- TOC -->
 
@@ -33,6 +34,12 @@ For example, each file in [tests/test-data](https://github.com/akshaybabloo/Spik
 pip install pyspikes
 ```
 
+Step Forward runs faster with [Numba](https://numba.pydata.org/) installed. The spikes are the same either way:
+
+```
+pip install pyspikes[numba]
+```
+
 ## Example
 
 ```python
@@ -46,6 +53,9 @@ print(bsa.get_spikes())
 
 tbr = encoder.TBR(data)
 print(tbr.get_spikes())
+
+sf = encoder.StepForward(data)
+print(sf.get_spikes())
 ```
 
 ## Contribution

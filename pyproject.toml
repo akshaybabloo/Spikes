@@ -30,9 +30,15 @@ dependencies = [
 Homepage = "https://github.com/akshaybabloo/Spikes"
 Issues = "https://github.com/akshaybabloo/Spikes/issues"
 
+[project.optional-dependencies]
+numba = [
+    "numba>=0.68",
+]
+
 [dependency-groups]
 dev = [
     "coverage>=7.16.2",
+    "numba>=0.68",
     "pytest>=9.1.1",
     "ruff>=0.17.1",
     "sphinx>=9.1.0",
