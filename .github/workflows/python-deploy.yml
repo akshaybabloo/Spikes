@@ -36,6 +36,31 @@ jobs:
     - name: Upload to PyPI
       run: uv publish
 
+  docs:
+    name: Publish docs to GitHub Pages
+    needs: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
+    - name: Install dependencies
+      run: uv sync --locked
+    - name: Build docs
+      run: uv run sphinx-build -W -b html docs docs/_build/html
+    - uses: actions/upload-pages-artifact@v4
+      with:
+        path: docs/_build/html
+    - id: deployment
+      uses: actions/deploy-pages@v4
+
   release:
     name: Release on GitHub
     needs: publish
