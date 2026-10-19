@@ -4,18 +4,20 @@ Spike Encoders
 
 In this module we will look at some in-built spike encoders.
 
-There are two encoders provided with this library which  can be used as it is or by spiNNaker.
+There are three encoders provided with this library which  can be used as it is or by spiNNaker.
 
 1. Temporal Based Encoding
 2. Bens Spiker Algorithm
+3. Step Forward
 """
 
 import numpy as np
 from scipy.signal import firwin
 
+from . import _kernels
 from .base import Encoder
 
-__all__ = ["BSA", "TBR"]
+__all__ = ["BSA", "TBR", "StepForward"]
 
 
 class TBR(Encoder):
@@ -81,30 +83,6 @@ class TBR(Encoder):
         # np.array([np.sign(sample_feature_threshold[i] - a) for i, a in enumerate(row_diff)])  # Possible answer
 
         return np.asarray(spikes, dtype=np.int8)
-
-    def get_spike_time(self, offset=100):
-        """
-        Merges the samples and returns the time at which the spike happens. Spike time always startes with ``1`` and
-        increases with :param: offset.
-
-        :param int offset:
-            Shifting the spike index to the given number, if the first index is ``0``, then it will always be ``1``
-        :rtype: list
-        :return: Spike time with an offset.
-        """
-
-        reshaped_raw_spikes = np.vstack(self.get_spikes())
-
-        spike_times = []
-
-        for _feature in reshaped_raw_spikes.T:
-            _idx_of_ones = np.squeeze(np.add(np.where(_feature == 1), 1))
-            if _idx_of_ones[0] == 1:
-                spike_times.append(np.insert(np.multiply(_idx_of_ones[1:], offset), 0, 1).tolist())
-            else:
-                spike_times.append(np.multiply(_idx_of_ones, offset).tolist())
-
-        return spike_times
 
     def _get_training_element_difference(self):
         """Returns row-by-row difference for each sample.
@@ -272,30 +250,6 @@ class BSA(Encoder):
 
         return output
 
-    def get_spike_time(self, offset=100):
-        """
-        Merges the samples and returns the time at which the spike happens. Spike time always startes with ``1`` and
-        increases with :param: offset.
-
-        :param int offset:
-            Shifting the spike index to the given number, if the first index is ``0``, then it will always be ``1``
-        :rtype: list
-        :return: Spike time with an offset.
-        """
-
-        reshaped_raw_spikes = np.vstack(self.get_spikes())
-
-        spike_times = []
-
-        for _feature in reshaped_raw_spikes.T:
-            _idx_of_ones = np.squeeze(np.add(np.where(_feature == 1), 1))
-            if _idx_of_ones[0] == 1:
-                spike_times.append(np.insert(np.multiply(_idx_of_ones[1:], offset), 0, 1).tolist())
-            else:
-                spike_times.append(np.multiply(_idx_of_ones, offset).tolist())
-
-        return spike_times
-
     def _fir_filter(self):
         """This method returns FIR filter using window method.
 
@@ -312,3 +266,69 @@ class BSA(Encoder):
         flow = {"filter_values": filter_values, "filter_length": len(filter_values)}
 
         return flow
+
+
+class StepForward(Encoder):
+    """
+    Step Forward (SF) encoding [3]_.
+
+    Each feature has a baseline that starts at its first value. When the signal rises above ``baseline + threshold``
+    a positive spike (``1``) is emitted and the baseline moves up by ``threshold``; when it falls below
+    ``baseline - threshold`` a negative spike (``-1``) is emitted and the baseline moves down. The spikes can be
+    decoded back to a staircase approximation of the signal: ``first value + threshold * cumulative sum of spikes``.
+
+    The threshold is in the units of the data and is the only parameter. By default it is set for each feature of
+    every sample to 1.5 times the mean absolute change between time steps. This factor is not taken from the paper; it
+    was chosen empirically, by how well the spikes reconstruct EEG (``tests/test-data``).
+
+    .. [3] Petro, B., Kasabov, N., & Kiss, R. M. (2020). Selection and optimization of temporal spike encoding methods
+        for spiking neural networks. IEEE Transactions on Neural Networks and Learning Systems, 31(2), 358-370.
+
+    """
+
+    def __init__(self, data, threshold=None):
+        """
+
+        :param ndarray data:
+            See :py:mod: nucube.utils.ReadCSV.get_samples()
+        :param float threshold:
+            Threshold in the units of the data. It can also be a list of threshold according to the numbers of input
+            features. If not given, it is 1.5 times the mean absolute change between time steps, for each feature of
+            every sample.
+        """
+
+        super().__init__()
+
+        self.data = data
+        self.threshold = threshold
+
+    def get_spikes(self):
+        """
+        Returns Step Forward spikes.
+
+        :rtype: ndarray
+        :return:
+            Spikes (``1``, ``-1`` or ``0``) with the same shape as the data. The first time step never spikes.
+        """
+
+        signal = np.ascontiguousarray(self.data, dtype=float)
+
+        return _kernels.step_forward(signal, self._get_threshold(signal))
+
+    def _get_threshold(self, signal):
+        """Returns the threshold for each feature of every sample.
+
+        :rtype: ndarray
+        :return: Threshold of shape ``(samples, features)``.
+        """
+
+        samples_size, _, features_size = signal.shape
+
+        if self.threshold is None:
+            return 1.5 * np.mean(np.abs(np.diff(signal, axis=1)), axis=1)
+        if isinstance(self.threshold, (float, int)):
+            return np.full((samples_size, features_size), float(self.threshold))
+        if isinstance(self.threshold, list):
+            return np.tile(np.asarray(self.threshold, dtype=float), (samples_size, 1))
+
+        raise TypeError("Unknown type given.")

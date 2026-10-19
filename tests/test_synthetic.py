@@ -5,7 +5,7 @@ import numpy.testing as npt
 import pytest
 from scipy.signal import chirp, lfilter, square
 
-from spikes.encoder import BSA, TBR
+from spikes.encoder import BSA, TBR, StepForward
 
 T = 500
 t = np.arange(T)
@@ -63,6 +63,36 @@ def test_bsa_encodes_batch_like_single_series():
         for feature in range(data.shape[2]):
             single = BSA(as_data(data[sample, :, feature])).get_spikes()[0, :, 0]
             npt.assert_array_equal(spikes[sample, :, feature], single)
+
+
+def step_forward_snr_db(signal):
+    """Encodes ``signal`` with default Step Forward, decodes it and returns the SNR in dB.
+
+    Decoding adds ``threshold`` for each positive spike and subtracts it for each negative one, starting from the first
+    value. As for BSA, the SNR is measured against the mean-removed signal.
+    """
+    data = as_data(signal)
+    encoder = StepForward(data)
+    spikes = encoder.get_spikes()[0, :, 0]
+    threshold = encoder._get_threshold(data)[0, 0]
+
+    decoded = signal[0] + threshold * np.cumsum(spikes)
+
+    reference = signal - signal.mean()
+    return 10 * np.log10(np.sum(reference**2) / np.sum((decoded - signal) ** 2))
+
+
+@pytest.mark.parametrize("name, min_snr_db", [("sine", 20), ("two sines", 11), ("chirp", 8), ("noisy sine", 14)])
+def test_step_forward_reconstructs_signal(name, min_snr_db):
+    assert step_forward_snr_db(SIGNALS[name]) >= min_snr_db
+
+
+def test_step_forward_climbs_step_one_threshold_at_a_time():
+    spikes = StepForward(as_data(SIGNALS["step"]), threshold=0.25).get_spikes()[0, :, 0]
+
+    expected = np.zeros(T, dtype=np.int8)
+    expected[T // 2 : T // 2 + 3] = 1  # Baseline 0 -> 0.25 -> 0.5 -> 0.75, then within a threshold of 1
+    npt.assert_array_equal(spikes, expected)
 
 
 @pytest.mark.parametrize("direction", [1, -1])
