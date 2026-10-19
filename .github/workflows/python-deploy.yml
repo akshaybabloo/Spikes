@@ -56,7 +56,7 @@ jobs:
       with:
         path: docs/_build/html
     - id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
 
   release:
     name: Release on GitHub
