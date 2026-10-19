@@ -22,4 +22,4 @@ def test_get_spikes_time():
 
     spikes_time = BSA(data).get_spike_time()
 
-    npt.assert_array_equal(spikes_time, test_spikes_time)
+    assert spikes_time == test_spikes_time.tolist()
