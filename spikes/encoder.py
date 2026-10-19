@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Copyright 2016 Akshay Raj Gollahalli
-
 """
 Spike Encoders
 ==============
@@ -14,6 +9,7 @@ There are two encoders provided with this library which  can be used as it is or
 1. Temporal Based Encoding
 2. Bens Spiker Algorithm
 """
+
 import operator
 
 import numpy as np
@@ -21,7 +17,7 @@ from scipy.signal import firwin
 
 from .base import Encoder
 
-__all__ = ['TBR', 'BSA']
+__all__ = ["BSA", "TBR"]
 
 
 class TBR(Encoder):
@@ -41,7 +37,7 @@ class TBR(Encoder):
             Threshold to cut off spike detection.
         """
 
-        super(TBR, self).__init__()
+        super().__init__()
         self.data = data
         self.threshold = threshold
 
@@ -76,9 +72,13 @@ class TBR(Encoder):
 
         spikes = []
         for idx, sample in enumerate(row_diff):
-            spikes.append(np.where(np.greater(sample, sample_feature_threshold[idx]), 1,
-                                   np.where(np.less(sample, -sample_feature_threshold[idx]), -1,
-                                            0)))
+            spikes.append(
+                np.where(
+                    np.greater(sample, sample_feature_threshold[idx]),
+                    1,
+                    np.where(np.less(sample, -sample_feature_threshold[idx]), -1, 0),
+                )
+            )
 
         # np.array([np.sign(sample_feature_threshold[i] - a) for i, a in enumerate(row_diff)])  # Possible answer
 
@@ -179,7 +179,7 @@ class BSA(Encoder):
         :param float cutoff:
         """
 
-        super(BSA, self).__init__()
+        super().__init__()
 
         self.data = data
         self.threshold = threshold
@@ -219,9 +219,8 @@ class BSA(Encoder):
         features_size = self.data.shape[2]
         fir_filter = self._fir_filter()
 
-        if isinstance(self.threshold, float) or isinstance(self.threshold, int):
-            bsa_row_vector = np.ones(
-                features_size) * self.threshold  # Transforming to scalar vector
+        if isinstance(self.threshold, (float, int)):
+            bsa_row_vector = np.ones(features_size) * self.threshold  # Transforming to scalar vector
         elif isinstance(self.threshold, list):
             bsa_row_vector = self.threshold
         else:
@@ -230,36 +229,31 @@ class BSA(Encoder):
         min_data = np.array([np.min(_sample, axis=0) for _sample in self.data])
         max_data = np.array([np.max(_sample, axis=0) for _sample in self.data])
 
-        min_data_tile = np.array(
-            [np.tile(min_data[num], (sample_rate, 1)) for num in range(sample_size)])
-        max_data_tile = np.array(
-            [np.tile(max_data[num], (sample_rate, 1)) for num in range(sample_size)])
+        min_data_tile = np.array([np.tile(min_data[num], (sample_rate, 1)) for num in range(sample_size)])
+        max_data_tile = np.array([np.tile(max_data[num], (sample_rate, 1)) for num in range(sample_size)])
 
         encoding_data = np.subtract(self.data, min_data_tile)
-        encoding_data = np.divide(encoding_data,
-                                  list(map(operator.sub, max_data_tile, min_data_tile)))
+        encoding_data = np.divide(encoding_data, list(map(operator.sub, max_data_tile, min_data_tile)))
 
         output = np.zeros([sample_size, sample_rate, features_size], dtype=np.int8)
 
         # BSA Algorithm
-        for _sample in range(0, sample_size):
-            for _feature in range(0, features_size):
-                for _idx in range(0, sample_rate - fir_filter['filter_length']):
+        for _sample in range(sample_size):
+            for _feature in range(features_size):
+                for _idx in range(sample_rate - fir_filter["filter_length"]):
                     error1 = 0
                     error2 = 0
 
-                    for j in range(0, fir_filter['filter_length']):
-                        error1 += abs(
-                            encoding_data[_sample][_idx][_feature] - fir_filter['filter_values'][j])
+                    for j in range(fir_filter["filter_length"]):
+                        error1 += abs(encoding_data[_sample][_idx][_feature] - fir_filter["filter_values"][j])
                         error2 += abs(encoding_data[_sample][_idx][_feature])
 
                     if error1 <= (error2 - bsa_row_vector[_feature]):
                         output[_sample][_idx][_feature] = 1
 
-                        for j in range(0, fir_filter['filter_length']):
+                        for j in range(fir_filter["filter_length"]):
                             if _idx + j <= features_size:
-                                encoding_data[_sample][_idx][_feature] -= \
-                                    fir_filter['filter_values'][j]
+                                encoding_data[_sample][_idx][_feature] -= fir_filter["filter_values"][j]
 
         return output
 
@@ -300,6 +294,6 @@ class BSA(Encoder):
         """
         filter_values = firwin(self.filter_length, cutoff=self.cutoff)
 
-        flow = {'filter_values': filter_values, 'filter_length': len(filter_values)}
+        flow = {"filter_values": filter_values, "filter_length": len(filter_values)}
 
         return flow

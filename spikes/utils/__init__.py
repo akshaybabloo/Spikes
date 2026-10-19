@@ -1,1 +1,1 @@
-__all__ = ['errors', 'read_data']
+__all__ = ["errors", "read_data"]

@@ -17,7 +17,7 @@ def log_it(yes=False):
         ch = logging.StreamHandler(sys.stdout)
         ch.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
-            "%(asctime)s [%(name)s] [%(funcName)s] [%(threadName)-12.12s] "
-            "[%(levelname)-5.5s]  %(message)s")
+            "%(asctime)s [%(name)s] [%(funcName)s] [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
+        )
         ch.setFormatter(formatter)
         root.addHandler(ch)
