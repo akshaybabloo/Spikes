@@ -1,23 +1,49 @@
 name: Python Deploy
 
 on:
-  release:
-    types: [published]
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
 
+permissions:
+  contents: read
 
 jobs:
-  build:
+  test:
+    name: Tests
+    uses: ./.github/workflows/python-app.yml
 
+  publish:
+    name: Publish to PyPI
+    needs: test
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
     - name: Set up uv
       uses: astral-sh/setup-uv@v7
+    - name: Check tag matches version
+      run: |
+        version="$(uv version --short)"
+        if [ "$version" != "$GITHUB_REF_NAME" ]; then
+          echo "::error::Tag $GITHUB_REF_NAME does not match pyproject.toml version $version"
+          exit 1
+        fi
     - name: Build
       run: uv build
     - name: Upload to PyPI
       run: uv publish
+
+  release:
+    name: Release on GitHub
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: softprops/action-gh-release@v3
+      with:
+        generate_release_notes: true
