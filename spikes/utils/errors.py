@@ -1,13 +1,13 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Copyright 2016 Akshay Raj Gollahalli
+
 """
 Exception used through out the Spikes api.
 """
 
-__all__ = ['SplitDataError', 'NotEnoughDataError',
-           'LengthMismatchError']
+__all__ = [
+    'LengthMismatchError',
+    'NotEnoughDataError',
+    'SplitDataError',
+]
 
 
 class SplitDataError(Exception):
@@ -17,7 +17,7 @@ class SplitDataError(Exception):
     """
 
     def __init__(self, message, errors=None):
-        super(SplitDataError, self).__init__(message)
+        super().__init__(message)
 
         self.errors = errors
 
@@ -28,7 +28,7 @@ class NotEnoughDataError(Exception):
     """
 
     def __init__(self, message, errors=None):
-        super(NotEnoughDataError, self).__init__(message)
+        super().__init__(message)
 
         self.errors = errors
 
@@ -39,6 +39,6 @@ class LengthMismatchError(Exception):
     """
 
     def __init__(self, message, errors=None):
-        super(LengthMismatchError, self).__init__(message)
+        super().__init__(message)
 
         self.errors = errors

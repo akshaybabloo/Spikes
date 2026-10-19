@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Encoder documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct  3 18:22:01 2016.
@@ -19,6 +17,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../'))
 
 # -- General configuration ------------------------------------------------

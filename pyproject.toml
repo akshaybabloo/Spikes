@@ -1,0 +1,59 @@
+[project]
+name = "pyspikes"
+version = "0.2.9"
+description = "Spiking Neural Network Spike Encoders"
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Akshay Raj Gollahalli", email = "akshay@gollahalli.com" },
+]
+keywords = ["Spiking Neural Network", "spike encoder"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.5.4",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/akshaybabloo/Spikes"
+Issues = "https://github.com/akshaybabloo/Spikes/issues"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.16.2",
+    "pytest>=9.1.1",
+    "ruff>=0.17.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "spikes"
+module-root = ""
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 127
+
+[tool.ruff.lint]
+extend-select = ["C90"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10

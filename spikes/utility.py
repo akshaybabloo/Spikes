@@ -1,13 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Copyright 2016 Akshay Raj Gollahalli
+
 
 """
 Reads the data from folders and json files.
 """
 
-from __future__ import print_function
 
 import csv
 import logging
@@ -23,8 +19,10 @@ from .utils.utils import log_it
 
 __all__ = ['ReadCSV']
 
+logger = logging.getLogger(__name__)
 
-class ReadCSV(object):
+
+class ReadCSV:
     """Reads the CSV files in a given folder.
 
     If no folder names is give, this program searches for folder ``Data``; If
@@ -53,8 +51,8 @@ class ReadCSV(object):
                 self.logger.debug("Reading the data")
             else:
                 self.logger.debug("%s does not exist", self.data_folder)
-        except IOError as err:
-            self.logger.exception("Data files not found - %s", err)
+        except OSError:
+            self.logger.exception("Data files not found")
             sys.exit(1)
 
         if len(self.prefixed) == 1:
@@ -86,9 +84,7 @@ class ReadCSV(object):
         if labels[0] is not False:
             if len(raw_samples_list) != len(labels):
                 LengthMismatchError(
-                    "Number of samples ({0}) is not equal to number of labels ({1}).".format(
-                        len(raw_samples_list),
-                        len(labels)))
+                    f"Number of samples ({len(raw_samples_list)}) is not equal to number of labels ({len(labels)}).")
             samples = {'samples': raw_samples_list, 'labels': labels}
         else:
             samples = {'samples': raw_samples_list}
@@ -146,11 +142,8 @@ class ReadCSV(object):
             Dictionary of ``time_length`` and ``feature_length``.
         """
         _file = self.prefixed[0]
-        sample = []
         with open(self.data_folder + _file) as csv_file:
-            reader = csv.reader(csv_file, delimiter=' ', quotechar='|')
-            for col in reader:
-                sample.append(col)
+            sample = list(csv.reader(csv_file, delimiter=' ', quotechar='|'))
 
         data_dict = {'time_length': len(sample), 'feature_length': len(sample[0][0].split(','))}
         self.logger.debug("Feature length returned")
@@ -175,13 +168,13 @@ class ReadCSV(object):
                     data = _file.read()
                 names = data.split('\n')
                 number_of_features = len(names)
-            except IOError as err:
-                self.logger.exception("File not found - %s", err)
+            except OSError:
+                self.logger.exception("File not found")
         else:
             with open(self.data_folder + self.prefixed[0]) as _file:
                 number_of_features = len(_file.readline().split(','))
                 for num in range(1, number_of_features + 1):
-                    names.append("feature {}".format(num))
+                    names.append(f"feature {num}")
 
         return {'number_of_features': number_of_features, 'name_features': names}
 
@@ -208,7 +201,7 @@ def atoi(text):
     :rtype: bool
     :return: True or false based on the digits in text.
     """
-    logging.debug("File names checked")
+    logger.debug("File names checked")
     return int(text) if text.isdigit() else text
 
 
@@ -222,5 +215,5 @@ def natural_keys(text):
     :return:
         Splits the ``text`` if number is present in it.
     """
-    logging.debug("File names split")
+    logger.debug("File names split")
     return [atoi(num) for num in re.split(r'(\d+)', text)]
