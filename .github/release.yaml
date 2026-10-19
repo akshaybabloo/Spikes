@@ -1,0 +1,16 @@
+changelog:
+  categories:
+    - title: Changes
+      labels:
+        - "*"
+      exclude:
+        labels:
+          - dependencies
+        authors:
+          - dependabot
+          - dependabot[bot]
+          - renovate
+          - renovate[bot]
+    - title: Dependencies
+      labels:
+        - "*"
