@@ -2,7 +2,7 @@
 
 | Branch | Codecov | CI |
 |--------|---------|---------------------------------------------------------------------------------------------------------------------------------------|
-| Master | Soon.. | ![Python application](https://github.com/akshaybabloo/Spikes/workflows/Python%20application/badge.svg) |
+| Master | [![codecov](https://codecov.io/gh/akshaybabloo/Spikes/graph/badge.svg?token=twI3KZYyLu)](https://codecov.io/gh/akshaybabloo/Spikes) | ![Python application](https://github.com/akshaybabloo/Spikes/workflows/Python%20application/badge.svg) |
 
 Spike encoders for Spiking Neural Network.
 

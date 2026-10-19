@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   build:
@@ -26,6 +27,10 @@ jobs:
     - name: Lint with ruff
       run: uv run ruff check --output-format=github
     - name: Test with pytest
-      run: uv run pytest
+      run: uv run pytest --cov --cov-branch --cov-report=xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Build docs
       run: uv run sphinx-build -W -b html docs docs/_build/html
