@@ -15,7 +15,6 @@ Bens Spiker Algorithm
 
 .. autoclass:: spikes.encoder.BSA
     :members:
-    :private-members:
 
 .. _tbr:
 
@@ -24,4 +23,3 @@ Threshold Based Representation
 
 .. autoclass:: spikes.encoder.TBR
     :members:
-    :private-members:
