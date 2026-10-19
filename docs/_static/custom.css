@@ -1,0 +1,22 @@
+/* Keep the footer at the bottom of the window on short pages. */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+div.document {
+    flex: 1 0 auto;
+}
+
+/* Stretch the white content area down to the footer. */
+div.documentwrapper,
+div.bodywrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+div.bodywrapper,
+div.body {
+    flex: 1 0 auto;
+}
