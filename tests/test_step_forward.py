@@ -4,8 +4,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from spikes import _kernels
-from spikes.encoder import StepForward
+from spikes.encoder import StepForward, step_forward
+from spikes.encoder.base import HAS_NUMBA
 from spikes.utility import ReadCSV
 
 
@@ -32,7 +32,7 @@ def test_step_forward_follows_baseline(backend):
     feature = [0.0, 0.4, 1.0, 1.2, 0.5, 0.0]
     signal = np.array([feature, feature]).T[np.newaxis].copy()
 
-    spikes = getattr(_kernels, f"step_forward_{backend}")(signal, np.array([[0.5, 2.0]]))
+    spikes = getattr(step_forward, f"step_forward_{backend}")(signal, np.array([[0.5, 2.0]]))
 
     npt.assert_array_equal(spikes[0, :, 0], [0, 0, 1, 1, 0, -1])
     npt.assert_array_equal(spikes[0, :, 1], [0, 0, 0, 0, 0, 0])
@@ -51,3 +51,12 @@ def test_threshold(threshold, expected):
 def test_unknown_threshold_type():
     with pytest.raises(TypeError):
         StepForward(np.zeros((1, 4, 1)), threshold="0.5").get_spikes()
+
+
+@pytest.mark.skipif(not HAS_NUMBA, reason="Numba is not installed")
+def test_backends_match(random_walks):
+    threshold = np.random.default_rng(7).uniform(0.1, 2, size=(random_walks.shape[0], random_walks.shape[2]))
+
+    expected = step_forward.step_forward_numpy(random_walks, threshold)
+
+    npt.assert_array_equal(step_forward.step_forward_numba(random_walks, threshold), expected)

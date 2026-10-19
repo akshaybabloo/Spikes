@@ -1,8 +1,13 @@
 """
-Base file for all classes.
+Base for all encoders, with the methods they share.
 """
 
+from importlib.util import find_spec
+
 import numpy as np
+
+# BSA and Step Forward compile their time loops with Numba when it is installed (``pip install pyspikes[numba]``)
+HAS_NUMBA = find_spec("numba") is not None
 
 
 class Encoder:
