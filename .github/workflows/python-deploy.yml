@@ -11,6 +11,7 @@ jobs:
   test:
     name: Tests
     uses: ./.github/workflows/python-app.yml
+    secrets: inherit
 
   publish:
     name: Publish to PyPI
