@@ -67,69 +67,24 @@ class TBR(Encoder):
 
         """
 
-        sample_feature_threshold = self._get_threshold()
-        row_diff = self._get_training_element_difference()
+        diff = np.diff(self.data, axis=1)
+        threshold = self._get_threshold(diff)[:, np.newaxis, :]
 
-        spikes = []
-        for idx, sample in enumerate(row_diff):
-            spikes.append(
-                np.where(
-                    np.greater(sample, sample_feature_threshold[idx]),
-                    1,
-                    np.where(np.less(sample, -sample_feature_threshold[idx]), -1, 0),
-                )
-            )
+        return (diff > threshold).astype(np.int8) - (diff < -threshold).astype(np.int8)
 
-        # np.array([np.sign(sample_feature_threshold[i] - a) for i, a in enumerate(row_diff)])  # Possible answer
+    def _get_threshold(self, diff):
+        """Returns the threshold for each feature of every sample: the mean absolute change between time steps plus
+        ``threshold`` times its standard deviation.
 
-        return np.asarray(spikes, dtype=np.int8)
-
-    def _get_training_element_difference(self):
-        """Returns row-by-row difference for each sample.
-
-        :rtype: numpy.ndarray
-        :return: row_diff
-        """
-
-        train_data = self.data
-
-        row_diff = []
-        for index in range(train_data.shape[0]):
-            row_diff.append(np.diff(train_data[index], axis=0))
-
-        return np.asarray(row_diff)
-
-    def _get_mean_sd_sample(self):
-        """Returns mean and standard deviation of absolute data.
-
-        :rtype: (numpy.ndarray, numpy.ndarray)
-        :return: mean, sd
-        """
-
-        diff_data = self._get_training_element_difference()
-        abs_data = np.abs(diff_data)
-        abs_data_shape_range = range(abs_data.shape[0])
-
-        mean = []
-        sd = []
-        for index in abs_data_shape_range:
-            mean.append(np.mean(abs_data[index], axis=0))
-
-        for index in abs_data_shape_range:
-            sd.append(np.std(abs_data[index], axis=0))
-
-        return np.asarray(mean), np.asarray(sd)
-
-    def _get_threshold(self):
-        """Returns threshold values for each feature of every sample.
-
+        :param ndarray diff:
+            Change between time steps, of shape ``(samples, time - 1, features)``.
         :rtype: ndarray
-        :return: threshold
+        :return: Threshold of shape ``(samples, features)``.
         """
 
-        mean, sd = self._get_mean_sd_sample()
+        abs_diff = np.abs(diff)
 
-        return np.add(mean, np.multiply(sd, self.threshold))
+        return np.mean(abs_diff, axis=1) + self.threshold * np.std(abs_diff, axis=1)
 
 
 class BSA(Encoder):
