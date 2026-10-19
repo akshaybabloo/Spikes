@@ -34,7 +34,7 @@ jobs:
     - name: Build
       run: uv build
     - name: Upload to PyPI
-      run: uv publish
+      run: uv publish --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
 
   docs:
     name: Publish docs to GitHub Pages
