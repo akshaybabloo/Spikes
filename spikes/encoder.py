@@ -166,7 +166,7 @@ class BSA(Encoder):
 
     """
 
-    def __init__(self, data, threshold=0.9, filter_length=20, cutoff=0.05):
+    def __init__(self, data, threshold=0.75, filter_length=12, cutoff=0.2):
         """
 
         :param ndarray data:

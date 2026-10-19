@@ -25,7 +25,7 @@ This package consists of two types of spike encoders for spatio-temporal data:
 
 The data given to the encoders are spatio-temporal. Each sample is one `csv` file. In each file, every column is a feature and the rows are time points.
 
-For example each file given in the [Data](https://github.com/akshaybabloo/Spikes/tree/master/Data) folder had 128 rows and 14 columns, 14 columns are the features and 128 columns are the data points.
+For example, each file in [tests/test-data](https://github.com/akshaybabloo/Spikes/tree/master/tests/test-data) is one second of EEG from the [PhysioNet EEG Motor Movement/Imagery Dataset](https://physionet.org/content/eegmmidb/1.0.0/): 160 rows (time points at 160 Hz) and 14 columns (EEG channels). See its [README](tests/test-data/README.md) for details and citation.
 
 ## Instillation
 
@@ -39,7 +39,7 @@ pip install pyspikes
 from spikes import encoder
 from spikes.utility import ReadCSV
 
-data = ReadCSV("Data").get_samples()["samples"]
+data = ReadCSV("tests/test-data").get_samples()["samples"]
 
 bsa = encoder.BSA(data)
 print(bsa.get_spikes())
