@@ -24,13 +24,8 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up uv
       uses: astral-sh/setup-uv@v7
-    - name: Check tag matches version
-      run: |
-        version="$(uv version --short)"
-        if [ "$version" != "$GITHUB_REF_NAME" ]; then
-          echo "::error::Tag $GITHUB_REF_NAME does not match pyproject.toml version $version"
-          exit 1
-        fi
+    - name: Set version from tag
+      run: uv version "$GITHUB_REF_NAME" --frozen
     - name: Build
       run: uv build
     - name: Upload to PyPI
@@ -51,6 +46,8 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up uv
       uses: astral-sh/setup-uv@v7
+    - name: Set version from tag
+      run: uv version "$GITHUB_REF_NAME" --no-sync
     - name: Install dependencies
       run: uv sync --locked
     - name: Build docs

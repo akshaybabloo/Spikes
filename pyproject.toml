@@ -1,6 +1,6 @@
 [project]
 name = "pyspikes"
-version = "0.2.9"
+version = "0.0.0"
 description = "Spiking Neural Network Spike Encoders"
 readme = "README.md"
 license = "BSD-3-Clause"
