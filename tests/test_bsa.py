@@ -3,6 +3,7 @@ import os
 import numpy as np
 import numpy.testing as npt
 
+from spikes import _kernels
 from spikes.encoder import BSA
 from spikes.utility import ReadCSV
 
@@ -25,20 +26,20 @@ def test_get_spikes_time():
     assert spikes_time == test_spikes_time.tolist()
 
 
-def test_bsa_spikes_where_filter_fits():
+def test_bsa_spikes_where_filter_fits(backend):
     # Feature 0 fires once the window matches the filter; feature 1's threshold is too high to fire at all.
     signal = np.array([[[0.0, 0.0], [0.5, 0.5], [0.5, 0.5], [0.0, 0.0]]])
     filter_values = np.array([0.5, 0.5])
 
-    spikes = BSA._bsa(signal, filter_values, np.array([0.1, 2.0]))
+    spikes = getattr(_kernels, f"bsa_{backend}")(signal, filter_values, np.array([0.1, 2.0]))
 
     npt.assert_array_equal(spikes[0], [[0, 0], [1, 0], [0, 0], [0, 0]])
     npt.assert_array_equal(signal[0, :, 0], [0.0, 0.0, 0.0, 0.0])
 
 
-def test_bsa_spikes_at_end_of_signal():
+def test_bsa_spikes_at_end_of_signal(backend):
     signal = np.array([[[0.0], [0.0], [0.0], [0.5]]])
 
-    spikes = BSA._bsa(signal, np.array([0.5, 0.5]), np.array([0.1]))
+    spikes = getattr(_kernels, f"bsa_{backend}")(signal, np.array([0.5, 0.5]), np.array([0.1]))
 
     npt.assert_array_equal(spikes[0, :, 0], [0, 0, 0, 1])

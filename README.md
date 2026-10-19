@@ -34,7 +34,7 @@ For example, each file in [tests/test-data](https://github.com/akshaybabloo/Spik
 pip install pyspikes
 ```
 
-Step Forward runs faster with [Numba](https://numba.pydata.org/) installed. The spikes are the same either way:
+BSA and Step Forward run faster with [Numba](https://numba.pydata.org/) installed. The spikes are the same either way:
 
 ```
 pip install pyspikes[numba]

@@ -4,8 +4,6 @@ Time loops of the encoders.
 Each loop has a NumPy version, which runs over every sample and feature at once, and a Numba version, which compiles
 the loop and runs the samples and features in parallel. The Numba versions are used when Numba is installed
 (``pip install pyspikes[numba]``); both give the same spikes.
-
-Only Step Forward uses these so far.
 """
 
 import numpy as np
@@ -16,6 +14,40 @@ except ImportError:
     HAS_NUMBA = False
 else:
     HAS_NUMBA = True
+
+
+def bsa_numpy(signal, filter_values, threshold):
+    """Runs BSA over every sample and feature at once.
+
+    Follows the pseudo-code in Schrauwen & Van Campenhout (2003): at time ``t`` the filter is compared with
+    ``signal[t:t + len(filter)]``, and if it fits a spike is emitted and the filter is subtracted from that window.
+    Near the end of the signal the window, and the filter, are cut short.
+
+    :param ndarray signal:
+        Normalised data of shape ``(samples, time, features)``. It is modified in place.
+    :param ndarray filter_values:
+        FIR filter taps.
+    :param ndarray threshold:
+        Threshold for each feature.
+    :rtype: ndarray
+    :return: Spikes with the same shape as ``signal``.
+    """
+
+    time_size = signal.shape[1]
+    output = np.zeros(signal.shape, dtype=np.int8)
+
+    for t in range(time_size):
+        window = signal[:, t : t + len(filter_values), :]
+        taps = filter_values[: window.shape[1], np.newaxis]
+
+        error1 = np.sum(np.abs(window - taps), axis=1)
+        error2 = np.sum(np.abs(window), axis=1)
+        fire = error1 <= (error2 - threshold)
+
+        output[:, t, :] = fire
+        window -= fire[:, np.newaxis, :] * taps
+
+    return output
 
 
 def step_forward_numpy(signal, threshold):
@@ -50,6 +82,32 @@ def step_forward_numpy(signal, threshold):
 if HAS_NUMBA:
 
     @njit(parallel=True, cache=True)
+    def bsa_numba(signal, filter_values, threshold):
+        """Numba version of :func:`bsa_numpy`."""
+
+        samples_size, time_size, features_size = signal.shape
+        output = np.zeros(signal.shape, dtype=np.int8)
+
+        for index in prange(samples_size * features_size):
+            sample = index // features_size
+            feature = index % features_size
+
+            for t in range(time_size):
+                width = min(len(filter_values), time_size - t)
+                error1 = 0.0
+                error2 = 0.0
+                for j in range(width):
+                    error1 += abs(signal[sample, t + j, feature] - filter_values[j])
+                    error2 += abs(signal[sample, t + j, feature])
+
+                if error1 <= error2 - threshold[feature]:
+                    output[sample, t, feature] = 1
+                    for j in range(width):
+                        signal[sample, t + j, feature] -= filter_values[j]
+
+        return output
+
+    @njit(parallel=True, cache=True)
     def step_forward_numba(signal, threshold):
         """Numba version of :func:`step_forward_numpy`."""
 
@@ -73,6 +131,8 @@ if HAS_NUMBA:
 
         return output
 
+    bsa = bsa_numba
     step_forward = step_forward_numba
 else:
+    bsa = bsa_numpy
     step_forward = step_forward_numpy

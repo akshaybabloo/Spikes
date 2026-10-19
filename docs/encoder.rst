@@ -9,7 +9,7 @@ There are three types of encoders:
 - :ref:`Threshold Based Representation (TBR) <tbr>`
 - :ref:`Step Forward (SF) <sf>`
 
-Step Forward runs faster when `Numba <https://numba.pydata.org/>`_ is installed
+BSA and Step Forward run faster when `Numba <https://numba.pydata.org/>`_ is installed
 (``pip install pyspikes[numba]``). The spikes are the same either way.
 
 .. _bsa:
