@@ -160,6 +160,11 @@ class BSA(Encoder):
     stimulation (converting spikes to analog values). A principle borrowed from unpublished modified
     Hough Spiker Algorithm (HSA) [2]_.
 
+    The defaults for ``threshold``, ``filter_length`` and ``cutoff`` are not taken from the paper; the best values
+    depend on the signal. They were chosen empirically, by how well the spikes reconstruct EEG (``tests/test-data``)
+    and smooth synthetic signals. For other data, tune them by reconstruction error, for example the signal-to-noise
+    ratio between the normalised input and the spikes convolved with the filter.
+
     .. [2] Schrauwen, B., & Van Campenhout, J. (2003, July). BSA, a fast and accurate spike train encoding scheme.
         In Proceedings of the international joint conference on neural networks (Vol. 4, No. 4, pp. 2825-2830).
         Piscataway, NJ: IEEE.
@@ -173,6 +178,8 @@ class BSA(Encoder):
             See :py:mod: nucube.utils.ReadCSV.get_samples()
         :param float threshold:
             Threshold level for spike. It can also be a list of threshold according to the numbers of input features.
+            It is subtracted, as in the paper: a spike fires when ``error1 <= error2 - threshold``. Some other
+            implementations multiply instead (``error2 * threshold``), so their thresholds are not comparable.
         :param int filter_length:
             Number of taps in the FIR filter. Longer filters follow slower changes in the signal.
         :param float cutoff:
