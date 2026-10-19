@@ -10,8 +10,6 @@ There are two encoders provided with this library which  can be used as it is or
 2. Bens Spiker Algorithm
 """
 
-import operator
-
 import numpy as np
 from scipy.signal import firwin
 
@@ -168,7 +166,7 @@ class BSA(Encoder):
 
     """
 
-    def __init__(self, data, threshold=0.5, filter_length=2, cutoff=0.8):
+    def __init__(self, data, threshold=0.9, filter_length=20, cutoff=0.05):
         """
 
         :param ndarray data:
@@ -176,7 +174,9 @@ class BSA(Encoder):
         :param float threshold:
             Threshold level for spike. It can also be a list of threshold according to the numbers of input features.
         :param int filter_length:
+            Number of taps in the FIR filter. Longer filters follow slower changes in the signal.
         :param float cutoff:
+            Cutoff frequency of the FIR filter, as a fraction of the Nyquist frequency.
         """
 
         super().__init__()
@@ -214,46 +214,54 @@ class BSA(Encoder):
           [0 0 0 ... 0 0 0]]]
         """
 
-        sample_size = self.data.shape[0]
-        sample_rate = self.data.shape[1]
         features_size = self.data.shape[2]
         fir_filter = self._fir_filter()
 
         if isinstance(self.threshold, (float, int)):
             bsa_row_vector = np.ones(features_size) * self.threshold  # Transforming to scalar vector
         elif isinstance(self.threshold, list):
-            bsa_row_vector = self.threshold
+            bsa_row_vector = np.asarray(self.threshold, dtype=float)
         else:
             raise TypeError("Unknown type given.")
 
-        min_data = np.array([np.min(_sample, axis=0) for _sample in self.data])
-        max_data = np.array([np.max(_sample, axis=0) for _sample in self.data])
+        # Normalise every feature of every sample to [0, 1]
+        min_data = np.min(self.data, axis=1, keepdims=True)
+        max_data = np.max(self.data, axis=1, keepdims=True)
+        encoding_data = (self.data - min_data) / (max_data - min_data)
 
-        min_data_tile = np.array([np.tile(min_data[num], (sample_rate, 1)) for num in range(sample_size)])
-        max_data_tile = np.array([np.tile(max_data[num], (sample_rate, 1)) for num in range(sample_size)])
+        return self._bsa(encoding_data, fir_filter["filter_values"], bsa_row_vector)
 
-        encoding_data = np.subtract(self.data, min_data_tile)
-        encoding_data = np.divide(encoding_data, list(map(operator.sub, max_data_tile, min_data_tile)))
+    @staticmethod
+    def _bsa(signal, filter_values, threshold):
+        """Runs BSA over every sample and feature at once.
 
-        output = np.zeros([sample_size, sample_rate, features_size], dtype=np.int8)
+        Follows the pseudo-code in Schrauwen & Van Campenhout (2003): at time ``t`` the filter is compared with
+        ``signal[t:t + len(filter)]``, and if it fits a spike is emitted and the filter is subtracted from that window.
+        Near the end of the signal the window, and the filter, are cut short.
 
-        # BSA Algorithm
-        for _sample in range(sample_size):
-            for _feature in range(features_size):
-                for _idx in range(sample_rate - fir_filter["filter_length"]):
-                    error1 = 0
-                    error2 = 0
+        :param ndarray signal:
+            Normalised data of shape ``(samples, time, features)``. It is modified in place.
+        :param ndarray filter_values:
+            FIR filter taps.
+        :param ndarray threshold:
+            Threshold for each feature.
+        :rtype: ndarray
+        :return: Spikes with the same shape as ``signal``.
+        """
 
-                    for j in range(fir_filter["filter_length"]):
-                        error1 += abs(encoding_data[_sample][_idx][_feature] - fir_filter["filter_values"][j])
-                        error2 += abs(encoding_data[_sample][_idx][_feature])
+        time_size = signal.shape[1]
+        output = np.zeros(signal.shape, dtype=np.int8)
 
-                    if error1 <= (error2 - bsa_row_vector[_feature]):
-                        output[_sample][_idx][_feature] = 1
+        for t in range(time_size):
+            window = signal[:, t : t + len(filter_values), :]
+            taps = filter_values[: window.shape[1], np.newaxis]
 
-                        for j in range(fir_filter["filter_length"]):
-                            if _idx + j <= features_size:
-                                encoding_data[_sample][_idx][_feature] -= fir_filter["filter_values"][j]
+            error1 = np.sum(np.abs(window - taps), axis=1)
+            error2 = np.sum(np.abs(window), axis=1)
+            fire = error1 <= (error2 - threshold)
+
+            output[:, t, :] = fire
+            window -= fire[:, np.newaxis, :] * taps
 
         return output
 
