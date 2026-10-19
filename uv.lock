@@ -504,7 +504,7 @@ wheels = [
 
 [[package]]
 name = "pyspikes"
-version = "0.2.9"
+version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
