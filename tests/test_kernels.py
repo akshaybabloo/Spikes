@@ -3,6 +3,7 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
+from scipy.signal import firwin
 
 from spikes import _kernels
 
@@ -10,6 +11,17 @@ pytestmark = pytest.mark.skipif(not _kernels.HAS_NUMBA, reason="Numba is not ins
 
 rng = np.random.default_rng(7)
 DATA = np.cumsum(rng.normal(size=(9, 300, 5)), axis=1)  # Random walks: smooth enough to spike in both directions
+
+
+@pytest.mark.parametrize("filter_length, cutoff", [(2, 0.8), (12, 0.2), (30, 0.05)])
+def test_bsa_backends_match(filter_length, cutoff):
+    signal = (DATA - DATA.min(axis=1, keepdims=True)) / np.ptp(DATA, axis=1, keepdims=True)
+    filter_values = firwin(filter_length, cutoff=cutoff)
+    threshold = rng.uniform(0, 1, size=DATA.shape[2])
+
+    expected = _kernels.bsa_numpy(signal.copy(), filter_values, threshold)
+
+    npt.assert_array_equal(_kernels.bsa_numba(signal.copy(), filter_values, threshold), expected)
 
 
 def test_step_forward_backends_match():

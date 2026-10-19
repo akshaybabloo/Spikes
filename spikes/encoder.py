@@ -214,41 +214,7 @@ class BSA(Encoder):
         max_data = np.max(self.data, axis=1, keepdims=True)
         encoding_data = (self.data - min_data) / (max_data - min_data)
 
-        return self._bsa(encoding_data, fir_filter["filter_values"], bsa_row_vector)
-
-    @staticmethod
-    def _bsa(signal, filter_values, threshold):
-        """Runs BSA over every sample and feature at once.
-
-        Follows the pseudo-code in Schrauwen & Van Campenhout (2003): at time ``t`` the filter is compared with
-        ``signal[t:t + len(filter)]``, and if it fits a spike is emitted and the filter is subtracted from that window.
-        Near the end of the signal the window, and the filter, are cut short.
-
-        :param ndarray signal:
-            Normalised data of shape ``(samples, time, features)``. It is modified in place.
-        :param ndarray filter_values:
-            FIR filter taps.
-        :param ndarray threshold:
-            Threshold for each feature.
-        :rtype: ndarray
-        :return: Spikes with the same shape as ``signal``.
-        """
-
-        time_size = signal.shape[1]
-        output = np.zeros(signal.shape, dtype=np.int8)
-
-        for t in range(time_size):
-            window = signal[:, t : t + len(filter_values), :]
-            taps = filter_values[: window.shape[1], np.newaxis]
-
-            error1 = np.sum(np.abs(window - taps), axis=1)
-            error2 = np.sum(np.abs(window), axis=1)
-            fire = error1 <= (error2 - threshold)
-
-            output[:, t, :] = fire
-            window -= fire[:, np.newaxis, :] * taps
-
-        return output
+        return _kernels.bsa(encoding_data, fir_filter["filter_values"], bsa_row_vector)
 
     def _fir_filter(self):
         """This method returns FIR filter using window method.
